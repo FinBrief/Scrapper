@@ -17,6 +17,18 @@ app.get('/health-check',(req,res)=>{
     })
 })
 
+app.post("/get-new-articles",(req,res)=>{
+    const body = req.body;
+    //auth
+    //start process async
+})
+
+app.post("/add-feed",(req,res)=>{
+    const body = req.body;
+    //auth
+    //start process async
+})
+
 app.listen(PORT, ()=>{
     console.log("Scrapper running on port 3000");
 })
