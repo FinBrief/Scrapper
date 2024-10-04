@@ -1,0 +1,7 @@
+#all distribution files
+**/dist
+
+# all env files
+**/.env
+
+**/node_modules
