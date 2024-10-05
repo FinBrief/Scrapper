@@ -8,3 +8,37 @@ are trying to use the same redis client creating a synchronization issue
 # Some Ideas for better scrapping
  - create a redis keyval map for newsAgency: (class where main content exist on page)
  - use langchain doc loader directly as a part of a chain
+
+```bash
+what all exists in my redis:
+
+1 -> feedQueue 
+  -> element = {
+        source: string;
+        title: string;
+        pubDate: number;
+        link: string;
+    }
+
+2 -> contentLocation
+  -> element = {
+        contentElement: Map<string,string>
+    }  
+    <source,class of content element>
+
+3 -> taskQueue
+  -> element = {
+        ...item,
+        content: Element | null
+    }
+
+4 -> rssLinks
+  -> element = {
+        rssMap: Map<string, Array of links >
+    }
+
+5 -> sources
+  -> element = {
+    sourceList : Array<string>
+  }
+```
