@@ -40,5 +40,12 @@ what all exists in my redis:
 5 -> sources
   -> element = {
     sourceList : Array<string>
-  }
+
+    }
+
+6 -> latestTimePost
+  -> element = {
+        map: Map<string of rss feed link, number ie date in miliseconds>
+
+    }
 ```

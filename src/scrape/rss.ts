@@ -8,6 +8,9 @@ export interface itemType{
     link: string;
 }
 
+export interface LatestTimeMap{
+    map: Map<string,number>
+}
 
 export const extractRssFeed = async (feedLink:string, source: string)=>{
     const parser = new Parser();
@@ -16,9 +19,17 @@ export const extractRssFeed = async (feedLink:string, source: string)=>{
 
     //date constraint to be added
     // source to be passed
+    const latestTimeMapStringified = await client.get("latestTimePost");
+    const latesTimeMap: LatestTimeMap= JSON.parse(latestTimeMapStringified|| '');
+    const latestTime = latesTimeMap.map.get(feedLink)|| -1;
 
     feed.items.forEach(async(item) =>{
         const date = Date.parse(item.pubDate || "");
+        //to not double inject the same article in to the pipeline
+        if(date<=latestTime){
+            return;
+        }
+
         const entity:itemType = {
             source,
             title: item.title || '',

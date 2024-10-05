@@ -24,16 +24,36 @@ app.post("/get-new-articles",(req,res)=>{
     const body = req.body;
     //auth
     //start process async
+    //call main function here 
 })
 
 app.post("/add-feed",(req,res)=>{
+
+     /**
+     * expected 
+     * body = {
+     *  source: string,
+     *  feedLink:  
+     * }
+     */
+
+
     const body = req.body;
     //auth
-    //start process async
+    // add in rssLinks -> rssMap
 })
 
 app.post("/add-news-source",(req,res)=>{
-    
+    /**
+     * expected 
+     * body = {
+     *  source: string,
+     *  contentLocation: string(class) 
+     * }
+     */
+
+    //auth 
+    // source 
 })
 
 app.listen(PORT, ()=>{

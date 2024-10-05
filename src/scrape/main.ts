@@ -2,6 +2,7 @@ import { json } from "express"
 import { getRedisClient } from "../dbClient"
 import { extractRssFeed } from "./rss"
 import { scrapeContent } from "./contentScrapper"
+import { taskHandler } from "../promptPipeline/taskQueueHandler"
 
 
 type sourceListType = {
@@ -49,4 +50,6 @@ export const main = async ()=>{
 
     await scrapeContent()
 
+    await taskHandler()
+    
 }
