@@ -1,6 +1,6 @@
 import { json } from "express";
-import { getRedisClient } from "../dbClient"
-import { summarize } from "./summarizer";
+import { getRedisPool } from '../dbClient';
+import { summarize } from './summarizer';
 
 export interface TaskType {
     source: string;
@@ -10,19 +10,22 @@ export interface TaskType {
     content: Element;
 }
 
+export const taskHandler = async () => {
+    const pool = getRedisPool();
+    const client = await pool.acquire();
 
-export const taskHandler = async ()=>{
-    const client = getRedisClient();
+    try {
+        const numberOfTasks = await client.LLEN("taskQueue");
 
-    const numberOfTasks = await client.LLEN("taskQueue");
+        for (let i = 0; i < numberOfTasks; i++) {
+            const stringifiedTask = await client.rPop("taskQueue");
+            const task: TaskType = JSON.parse(stringifiedTask || '');
 
-    for(let i=0;i<numberOfTasks;i++){
-        const stringifiedtask = await client.rPop("taskQueue");
+            const summary = await summarize(task);
 
-        const task:TaskType = JSON.parse(stringifiedtask|| '');
-
-        const summary = await summarize(task);
-
-        //db call to save this in RDB
+            // db call to save this in RDB
+        }
+    } finally {
+        pool.release(client);
     }
-}
+};

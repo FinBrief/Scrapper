@@ -1,5 +1,4 @@
-import { json } from "express"
-import { getRedisClient } from "../dbClient"
+import { getRedisPool } from "../dbClient"
 import { extractRssFeed } from "./rss"
 import { scrapeContent } from "./contentScrapper"
 import { taskHandler } from "../promptPipeline/taskQueueHandler"
@@ -23,33 +22,50 @@ type rssLinksType = {
  * }
  */
 export const main = async ()=>{
-    const client = getRedisClient();
+    const pool = getRedisPool();
+    const client = await pool.acquire();
 
-    const stringifiedsources = await client.get('sources')
+    try{
 
-    const sources: sourceListType = JSON.parse(stringifiedsources || '')
-    const sourceList = sources.sourceList;
-
-    const stringifiedRssLinks = await client.get('rssLinks');
-    const rssLinks: rssLinksType = JSON.parse(stringifiedRssLinks || '');
-    const rssMap = rssLinks.map;
-
-    const n = sourceList.length;
-
-    for(let i =0;i<n;i++){
-        //list of all the rss feeds for a particular new agency or source
-        const linkList = rssMap.get(sourceList[i]);
-        if(linkList===undefined){
-            continue;
+        //get all the sources
+        const stringifiedsources = await client.get('sources')
+        if(stringifiedsources===null){
+            throw new Error("No sources found")
         }
-        const m = linkList.length;
-        for(let j=0;j<m;j++){
-            await extractRssFeed(linkList[j],sourceList[i])
+        const sources: sourceListType = JSON.parse(stringifiedsources)
+        const sourceList = sources.sourceList;
+
+        //get all the rss feeds
+        const stringifiedRssLinks = await client.get('rssLinks');
+        if(stringifiedRssLinks===null){
+            throw new Error("No rss links found")
         }
+        const rssLinks: rssLinksType = JSON.parse(stringifiedRssLinks);
+        const rssMap = rssLinks.map;
+
+        const n = sourceList.length;
+
+        for(let i =0;i<n;i++){
+            //list of all the rss feeds for a particular new agency or source
+            const linkList = rssMap.get(sourceList[i]);
+            if(linkList===undefined){
+                continue;
+            }
+            const m = linkList.length;
+            for(let j=0;j<m;j++){
+                await extractRssFeed(linkList[j],sourceList[i])
+            }
+            
+        }
+        // here i sexactly where i would want to parallelize the processes
+
+        await scrapeContent()
+
+        await taskHandler()
+    }catch(e){
+        console.log(e)
+    }finally {
+        pool.release(client);
     }
-
-    await scrapeContent()
-
-    await taskHandler()
     
 }

@@ -1,13 +1,13 @@
 import express from 'express';
 import {config } from 'dotenv';
-import { getRedisClient } from './dbClient';
+import { getRedisPool } from './dbClient';
 
 
 config();
 
 const app = express();
 
-const client = getRedisClient();
+const pool = getRedisPool();
 
 app.use(express.json());
 const PORT = parseInt(process.env.PORT|| '');
@@ -27,7 +27,7 @@ app.post("/get-new-articles",(req,res)=>{
     //call main function here 
 })
 
-app.post("/add-feed",(req,res)=>{
+app.post("/add-feed",async(req,res)=>{
 
      /**
      * expected 
@@ -36,14 +36,18 @@ app.post("/add-feed",(req,res)=>{
      *  feedLink:  
      * }
      */
+     const client = await pool.acquire();
+     try {
+         const body = req.body;
+     } finally {
+         pool.release(client);
+     }
 
-
-    const body = req.body;
     //auth
     // add in rssLinks -> rssMap
 })
 
-app.post("/add-news-source",(req,res)=>{
+app.post("/add-news-source",async(req,res)=>{
     /**
      * expected 
      * body = {
@@ -54,6 +58,12 @@ app.post("/add-news-source",(req,res)=>{
 
     //auth 
     // source 
+    const client = await pool.acquire();
+     try {
+         const body = req.body;
+     } finally {
+         pool.release(client);
+     }
 })
 
 app.listen(PORT, ()=>{
