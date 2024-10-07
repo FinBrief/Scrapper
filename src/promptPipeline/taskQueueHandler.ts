@@ -1,4 +1,3 @@
-import { json } from "express";
 import { getRedisPool } from '../dbClient';
 import { summarize } from './summarizer';
 
@@ -28,4 +27,4 @@ export const taskHandler = async () => {
     } finally {
         pool.release(client);
     }
-};
+}; 

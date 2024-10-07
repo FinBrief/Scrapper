@@ -1,6 +1,8 @@
 import express from 'express';
 import {config } from 'dotenv';
 import { getRedisPool } from './dbClient';
+import { main } from './scrape/main';
+import { addFeed } from './utils/addFeed';
 
 
 config();
@@ -22,6 +24,12 @@ app.get('/health-check',(req,res)=>{
 
 app.post("/get-new-articles",(req,res)=>{
     const body = req.body;
+
+    main();
+
+    res.json({
+        message: "Started the process"
+    })
     //auth
     //start process async
     //call main function here 
@@ -33,37 +41,26 @@ app.post("/add-feed",async(req,res)=>{
      * expected 
      * body = {
      *  source: string,
-     *  feedLink:  
+     *  feedLink: string
      * }
      */
      const client = await pool.acquire();
      try {
-         const body = req.body;
+        const {source, feedLink}:{source: string, feedLink:string} = req.body;
+        await addFeed(source.toLowerCase(),feedLink);
+
+        res.json({
+            message: "Feed added successfully"
+        })
+
+     }catch(e){
+        console.log("Some problem was caused in adding the feed");
      } finally {
          pool.release(client);
      }
 
     //auth
     // add in rssLinks -> rssMap
-})
-
-app.post("/add-news-source",async(req,res)=>{
-    /**
-     * expected 
-     * body = {
-     *  source: string,
-     *  contentLocation: string(class) 
-     * }
-     */
-
-    //auth 
-    // source 
-    const client = await pool.acquire();
-     try {
-         const body = req.body;
-     } finally {
-         pool.release(client);
-     }
 })
 
 app.listen(PORT, ()=>{

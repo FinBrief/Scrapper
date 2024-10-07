@@ -55,6 +55,7 @@ const getPageContents = async (url: string, source: string) => {
             return content;
         });
 
+        await browser.close();
         return content;
     } finally {
         pool.release(client);

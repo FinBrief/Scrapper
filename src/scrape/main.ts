@@ -40,8 +40,8 @@ export const main = async ()=>{
         if(stringifiedRssLinks===null){
             throw new Error("No rss links found")
         }
-        const rssLinks: rssLinksType = JSON.parse(stringifiedRssLinks);
-        const rssMap = rssLinks.map;
+        const rssLinks = JSON.parse(stringifiedRssLinks);
+        const rssMap = new Map<string,Array<string>>(Object.entries(rssLinks.map));
 
         const n = sourceList.length;
 
@@ -57,11 +57,13 @@ export const main = async ()=>{
             }
             
         }
-        // here i sexactly where i would want to parallelize the processes
+
+        //makes no sense to parallelize this as we are only using single thread.
 
         await scrapeContent()
 
-        await taskHandler()
+        //await taskHandler()
+       
     }catch(e){
         console.log(e)
     }finally {
