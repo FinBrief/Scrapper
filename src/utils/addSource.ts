@@ -1,12 +1,14 @@
 import { getRedisPool } from "../dbClient";
+import { addContentLocation } from "./addContentLocation";
 
 
-export const addSource = async (source: string) => {
+export const addSource = async (source: string, contentLocation:string) => {
     //auth
     // add in sources -> sourceList
     const pool = getRedisPool();
     const client = await pool.acquire();
     try {
+        await addContentLocation(source,contentLocation);
         const stringifiedsources = await client.get('sources')
         if (stringifiedsources === null) {
             const sources = {
@@ -23,6 +25,7 @@ export const addSource = async (source: string) => {
         }
         sourceList.push(source);
         await client.set('sources', JSON.stringify(sources));
+
     }catch(e){
         console.log(e);
     } 

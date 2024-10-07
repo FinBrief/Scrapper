@@ -3,6 +3,7 @@ import {config } from 'dotenv';
 import { getRedisPool } from './dbClient';
 import { main } from './scrape/main';
 import { addFeed } from './utils/addFeed';
+import { addSource } from './utils/addSource';
 
 
 config();
@@ -61,6 +62,35 @@ app.post("/add-feed",async(req,res)=>{
 
     //auth
     // add in rssLinks -> rssMap
+})
+
+app.post("/add-source",async(req,res)=>{
+    /**
+     * expected 
+     * body = {
+     *  source: string,
+     *  contentLocation: string
+     * }
+     */
+
+    const client = await pool.acquire();
+    try {
+        const {source, contentLocation}:{source: string, contentLocation: string } = req.body;
+        await addSource(source.toLowerCase(),contentLocation);
+
+        res.json({
+            message: "Source added successfully"
+        })
+        
+    } catch (error) {
+        
+    }finally{
+        pool.release(client);
+    }
+
+    
+    //auth
+    // add in sources -> sourceList
 })
 
 app.listen(PORT, ()=>{

@@ -48,7 +48,7 @@ const getPageContents = async (url: string, source: string) => {
         const page = await browser.newPage();
 
         await page.goto(url, { waitUntil: 'networkidle2' });
-        await page.waitForSelector('.' + divClass);
+        await page.waitForSelector( '.' +divClass);
 
         const content = await page.evaluate(() => {
             const content = document.querySelector('.' + divClass);

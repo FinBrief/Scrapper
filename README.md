@@ -10,7 +10,9 @@ are trying to use the same redis client creating a synchronization issue
  - use langchain doc loader directly as a part of a chain
 
 
-## no need for redis connection pool, can be don eusing a singleton
+## no need for redis connection pool, can be done using a singleton
+
+
 
 ```bash
 what all exists in my redis:
