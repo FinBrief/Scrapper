@@ -1,21 +1,18 @@
-# Might want to create individual redis clients for services as
-while async process run in background it might happen that 2 services 
-are trying to use the same redis client creating a synchronization issue
 
+# This is the Scrapper for FinBrief
 
-# try catch blocks are to be added
-
-# Some Ideas for better scrapping
+## Some Ideas for better scrapping
  - create a redis keyval map for newsAgency: (class where main content exist on page)
  - use langchain doc loader directly as a part of a chain
 
 
-## no need for redis connection pool, can be done using a singleton
+-> No need for redis connection pool, can be done using a singleton
+
+-> Brain Storming ideas and Features on - [doc](https://docs.google.com/document/d/1qqUtHU3fa_lNoeGDPQ69PCJvUnsbVg9sLhgE8C07Dek/edit?usp=sharing)
 
 
-
+## what all exists in the Redis DB:
 ```bash
-what all exists in my redis:
 
 1 -> feedQueue 
   -> element = {
@@ -54,3 +51,29 @@ what all exists in my redis:
 
     }
 ```
+## Run Locally
+
+Clone the project
+
+```bash
+  git clone https://github.com/FinBrief/Scrapper.git
+```
+
+Go to the project directory
+
+```bash
+  cd scrapper
+```
+
+To get Started locally (docker desktop must be running(for deamon to be active))
+
+```bash
+  npm run prereqs
+```
+
+Start the server
+
+```bash
+  npm run start
+```
+

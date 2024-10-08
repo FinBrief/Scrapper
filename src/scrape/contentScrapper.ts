@@ -42,22 +42,30 @@ const getPageContents = async (url: string, source: string) => {
     try {
         const response = await client.get('contentLocation');
         const transformedRes = JSON.parse(response || '');
-        const divClass = transformedRes.contentElement.get(source);
+        const locationMap = new Map<string, string>(transformedRes.contentElement);
+        const location = locationMap.get(source);
+
+        if(!location){
+            throw new Error("Location not found");
+        }
 
         const browser = await puppeteer.launch({ headless: true });
         const page = await browser.newPage();
 
         await page.goto(url, { waitUntil: 'networkidle2' });
-        await page.waitForSelector( '.' +divClass);
+        // Use a dot to target class selector
+        await page.waitForSelector(location); 
 
-        const content = await page.evaluate(() => {
-            const content = document.querySelector('.' + divClass);
-            return content;
-        });
+        const content = await page.evaluate((location) => {
+            const contentElement = document.querySelector(location); // Use the parameter properly
+            return contentElement ? contentElement.innerHTML : null; // Extract the innerHTML
+        }, location);
 
         await browser.close();
         return content;
-    } finally {
+    }catch(e){
+        console.error(e);
+    }finally {
         pool.release(client);
     }
 };
