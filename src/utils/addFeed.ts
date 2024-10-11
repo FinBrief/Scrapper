@@ -1,43 +1,41 @@
-import { getRedisPool } from "../dbClient";
-import { addSource } from "./addSource";
-
+import { prismaClient as prisma } from "..";
+import Parser from "rss-parser";
 
 export const addFeed = async (source: string, rssLink: string) => {
-    //auth
-    // add in rssLinks -> rssMap
-    const pool = getRedisPool();
-    const client = await pool.acquire();
     try {
-        const stringifiedRssLinks = await client.get('rssLinks');
-        if (stringifiedRssLinks === null) {
-            const myMap = new Map<string, Array<string>>();
-            myMap.set(source, [rssLink]);
-            //serisalizing the map and store it in redis, because Map cannot be stringified directly
-            const rssLinks = {
-                map: Object.fromEntries(myMap)
+
+        const parser = new Parser();
+        const feed = await parser.parseURL(rssLink);
+        
+        const existingFeed = await prisma.rssLinks.findFirst({
+            where:{
+                link: rssLink
             }
-            await client.set('rssLinks', JSON.stringify(rssLinks));
-            return;
+        })
+        if(existingFeed){
+            throw new Error("Feed already exists")
         }
-        const rssLinks = JSON.parse(stringifiedRssLinks);
-        //deserisalizing the map
-        const rssMap = new Map<string, Array<string>>(Object.entries(rssLinks.map));
-
-        const linkList = rssMap.get(source);
-        if(linkList===undefined){
-            throw new Error("Source not found");
-        }else{
-            linkList.push(rssLink);
-            rssMap.set(source, linkList);
+        const sourceobj = await prisma.sources.findFirst({
+            where:{
+                name: source
+            }
+        })
+        if(!sourceobj){
+            throw new Error("Source does not exist")
         }
-        //serisalizing the map and store it in redis
-        rssLinks.map = Object.fromEntries(rssMap);
-
-        await client.set('rssLinks', JSON.stringify(rssLinks));
-    }catch(e){
-        console.log("Problem in addFeed Function caused an error", e);
-    }
-     finally {
-        pool.release(client);
+        await prisma.rssLinks.create({
+            data:{
+                name: feed.title || "",
+                link: rssLink,
+                source: {
+                    connect:{
+                        name: source
+                    }
+                }
+            }
+        })
+        
+    } catch (error) {
+        console.log("Some problem was caused in adding the feed",error);
     }
 }

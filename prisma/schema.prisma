@@ -8,12 +8,12 @@ datasource db {
 }
 
 model User {
-  id          String          @id @default(uuid()) @map("id")
-  supabaseId  String          @unique
-  email       String          @unique
-  username    String          @unique
-  savedPosts  Post[]
-  perfferedTags Tag[]
+  id              String          @id @default(uuid()) @map("id")
+  supabaseId      String          @unique
+  email           String          @unique
+  username        String          @unique
+  savedPosts      Post[]
+  perfferedTags   Tag[]
 }
 
 model Tag {
@@ -24,7 +24,7 @@ model Tag {
 }
 
 model Post {
-  id          String    @id @default(uuid())
+  id          String        @id @default(uuid())
   title       String
   summary     String
   link        String
@@ -32,22 +32,22 @@ model Post {
   tags        Tag[]     
   users       User[]
   sourceId    String
-  source      sources   @relation(fields: [sourceId], references: [id])
+  source      sources       @relation(fields: [sourceId], references: [id])
 }
 
 model sources{
-  id          String    @id @default(uuid())
-  name        String
-  contentLocation String
-  rssLinks    rssLinks[]
-  posts       Post[]
+  id                  String    @id @default(uuid())
+  name                String    @unique
+  contentLocation     String
+  rssLinks            rssLinks[]
+  posts               Post[]
 }
 
 model rssLinks{
-  id                String    @id @default(uuid())
+  id                String      @id @default(uuid())
   name              String
-  link              String
-  source            sources @relation(fields: [sourceId], references: [id])
+  link              String      @unique
+  source            sources     @relation(fields: [sourceId], references: [id])
   sourceId          String
-  latestPostTime    Int
+  latestPostTime    Int         @default(-1)
 }

@@ -4,9 +4,13 @@ import { getRedisPool } from './dbClient';
 import { main } from './scrape/main';
 import { addFeed } from './utils/addFeed';
 import { addSource } from './utils/addSource';
+import { PrismaClient } from '@prisma/client';
+import { initInmemoryVars } from './utils/initInmemoryVars';
 
 
 config();
+
+export const prismaClient = new PrismaClient();
 
 const app = express();
 
@@ -23,17 +27,15 @@ app.get('/health-check',(req,res)=>{
     })
 })
 
-app.post("/get-new-articles",(req,res)=>{
-    const body = req.body;
+app.get("/get-new-articles",async (req,res)=>{
+
+    await initInmemoryVars();
 
     main();
 
     res.json({
         message: "Started the process"
     })
-    //auth
-    //start process async
-    //call main function here 
 })
 
 app.post("/add-feed",async(req,res)=>{

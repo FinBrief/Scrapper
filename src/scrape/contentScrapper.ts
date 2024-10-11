@@ -2,6 +2,7 @@ import { RedisClientType } from "redis";
 import { getRedisPool } from "../dbClient"
 import { itemType } from "./rss";
 import puppeteer from "puppeteer";
+import { contentLocationMap } from "../utils/initInmemoryVars";
 
 
 export const scrapeContent = async () => {
@@ -36,14 +37,10 @@ const contentlocation = {
  */
 
 const getPageContents = async (url: string, source: string) => {
-    const pool = getRedisPool();
-    const client = await pool.acquire();
 
     try {
-        const response = await client.get('contentLocation');
-        const transformedRes = JSON.parse(response || '');
-        const locationMap = new Map<string, string>(transformedRes.contentElement);
-        const location = locationMap.get(source);
+        
+        const location = contentLocationMap.get(source);
 
         if(!location){
             throw new Error("Location not found");
@@ -65,8 +62,6 @@ const getPageContents = async (url: string, source: string) => {
         return content;
     }catch(e){
         console.error(e);
-    }finally {
-        pool.release(client);
     }
 };
 

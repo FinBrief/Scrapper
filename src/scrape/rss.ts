@@ -1,6 +1,6 @@
 import Parser from 'rss-parser';
 import { getRedisPool } from '../dbClient';
-import { RedisClientType } from 'redis';
+import { latestTimeMap } from '../utils/initInmemoryVars';
 
 export interface itemType {
     source: string;
@@ -9,9 +9,6 @@ export interface itemType {
     link: string;
 }
 
-// export interface LatestTimeMap {
-//     map: Map<string, number>;
-// }
 
 export const extractRssFeed = async (feedLink: string, source: string) => {
     const parser = new Parser();
@@ -20,17 +17,7 @@ export const extractRssFeed = async (feedLink: string, source: string) => {
     const client = await pool.acquire();
 
     try {
-        const latestTimeMapStringified = await client.get("latestTimePost");
-        let latestTimeMap;
-
-        if(latestTimeMapStringified === null){ // this will run only the for the first time
-            latestTimeMap = new Map<string, number>();
-            
-        }
-        else{
-            const obj = JSON.parse(latestTimeMapStringified);
-            latestTimeMap = new Map<string, number>(Object.entries(obj.map));
-        }
+        
         const latestTime = latestTimeMap.get(feedLink) || -1;
 
         feed.items.forEach(async (item) => {
@@ -52,10 +39,7 @@ export const extractRssFeed = async (feedLink: string, source: string) => {
         const latestItemPubDate = feed.items[0].pubDate;
         const newLatestTime = Date.parse(latestItemPubDate || "");
         latestTimeMap.set(feedLink, newLatestTime);
-        const obj = {
-            map: Object.fromEntries(latestTimeMap)
-        }
-        await client.set("latestTimePost", JSON.stringify(obj));
+        
     }
     catch (e) {
         console.log("Error in extractRssFeed function caused an error", e);

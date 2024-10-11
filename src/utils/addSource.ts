@@ -1,35 +1,26 @@
-import { getRedisPool } from "../dbClient";
-import { addContentLocation } from "./addContentLocation";
+import { prismaClient as prisma} from "..";
+
 
 
 export const addSource = async (source: string, contentLocation:string) => {
-    //auth
-    // add in sources -> sourceList
-    const pool = getRedisPool();
-    const client = await pool.acquire();
     try {
-        await addContentLocation(source,contentLocation);
-        const stringifiedsources = await client.get('sources')
-        if (stringifiedsources === null) {
-            const sources = {
-                sourceList: [source]
+        const existingSources = await prisma.sources.findFirst({
+            where:{
+                name: source
             }
-            await client.set('sources', JSON.stringify(sources));
-            return;
+        });
+        if(existingSources){
+            throw new Error("Source already exists");
         }
-        const sources = JSON.parse(stringifiedsources);
-        const sourceList:Array<string> = sources.sourceList;
-        const alreadyExists = sourceList.find((s)=>s===source);
-        if(alreadyExists){
-            return;
-        }
-        sourceList.push(source);
-        await client.set('sources', JSON.stringify(sources));
-
-    }catch(e){
-        console.log(e);
-    } 
-    finally {
-        pool.release(client);
+        await prisma.sources.create({
+            data:{
+                name: source,
+                contentLocation
+            }
+        })
+        
+    } catch (error) {
+        console.log("Some problem was caused in adding the source",error);
     }
+    
 }
