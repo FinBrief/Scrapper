@@ -1,9 +1,18 @@
 
 # This is the Scrapper for FinBrief
 
-## Some Ideas for better scrapping
- - create a redis keyval map for newsAgency: (class where main content exist on page)
- - use langchain doc loader directly as a part of a chain
+## To start locally alwasys follow these steps(make sure docker command is working on your machine):
+- npm run build
+- npm run cache
+- npm run start
+
+## Some Better Ideas
+ - Store all redis data in main Db then before each cycle pull it into in memory maps, then
+    redis will only have queues 
+ 
+## current stuck ups 
+ - how to use prisma to connect to same db on tow different servers
+ - designing tables to streamline the user Intreaction, and data requirements of the scrapper
 
 
 -> No need for redis connection pool, can be done using a singleton
