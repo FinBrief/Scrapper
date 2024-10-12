@@ -26,7 +26,7 @@ export const main = async ()=>{
 
         await scrapeContent()
 
-        await taskHandler()
+        //await taskHandler()
 
         await updateVarsPostProcess()
        

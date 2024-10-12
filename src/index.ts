@@ -20,12 +20,21 @@ app.use(express.json());
 const PORT = parseInt(process.env.PORT|| '');
 
 
-app.get('/health-check',(req,res)=>{
+app.get('/health-check',async(req,res)=>{
 
-    res.json({
-        message: "Server is alive"
-    })
+    try {
+        await prismaClient.$connect();
+        res.json({
+            message: "Server and Database are alive"
+        })
+    } catch (error) {
+        res.json({
+            message: "Database is not alive"
+        })
+    }
 })
+
+
 
 app.get("/get-new-articles",async (req,res)=>{
 
@@ -47,7 +56,6 @@ app.post("/add-feed",async(req,res)=>{
      *  feedLink: string
      * }
      */
-     const client = await pool.acquire();
      try {
         const {source, feedLink}:{source: string, feedLink:string} = req.body;
         await addFeed(source.toLowerCase(),feedLink);
@@ -58,9 +66,7 @@ app.post("/add-feed",async(req,res)=>{
 
      }catch(e){
         console.log("Some problem was caused in adding the feed");
-     } finally {
-         pool.release(client);
-     }
+     } 
 
     //auth
     // add in rssLinks -> rssMap
@@ -75,7 +81,6 @@ app.post("/add-source",async(req,res)=>{
      * }
      */
 
-    const client = await pool.acquire();
     try {
         const {source, contentLocation}:{source: string, contentLocation: string } = req.body;
         await addSource(source.toLowerCase(),contentLocation);
@@ -86,8 +91,6 @@ app.post("/add-source",async(req,res)=>{
         
     } catch (error) {
         
-    }finally{
-        pool.release(client);
     }
 
     

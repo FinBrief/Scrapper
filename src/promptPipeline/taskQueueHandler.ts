@@ -1,5 +1,6 @@
 import { getRedisPool } from '../dbClient';
 import { summarize } from './summarizer';
+import { prismaClient as prisma } from '..';
 
 export interface TaskType {
     source: string;
@@ -22,7 +23,19 @@ export const taskHandler = async () => {
 
             const summary = await summarize(task);
 
-            // db call to save this in RDB
+            await prisma.post.create({
+                data: {
+                    title: task.title,
+                    source: {
+                        connect:{
+                            name: task.source
+                        }
+                    },
+                    pubDate: new Date(task.pubDate),
+                    link: task.link,
+                    summary: summary.content|| "",
+                }
+            })
         }
     } finally {
         pool.release(client);
