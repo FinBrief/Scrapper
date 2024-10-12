@@ -2,10 +2,10 @@ import { prismaClient as prisma } from "..";
 
 
 
-export const sources : Array<string> = [];
-export const rssLink : Map<string,Array<string>> = new Map<string,Array<string>>();
-export const contentLocationMap : Map<string,string> = new Map<string,string>(); 
-export const latestTimeMap : Map<string,number> = new Map<string,number>();
+export let sources : Array<string> = [];
+export let rssLink : Map<string,Array<string>> = new Map<string,Array<string>>();
+export let contentLocationMap : Map<string,string> = new Map<string,string>(); 
+export let latestTimeMap : Map<string,number> = new Map<string,number>();
 
 
 export const initInmemoryVars = async ()=>{
