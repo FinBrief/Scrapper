@@ -5,7 +5,7 @@ import { main } from './scrape/main';
 import { addFeed } from './utils/addFeed';
 import { addSource } from './utils/addSource';
 import { PrismaClient } from '@prisma/client';
-import { initInmemoryVars } from './utils/initInmemoryVars';
+import { addFeedSchema, addSourceSchema } from './utils/requestTypes';
 
 
 config();
@@ -38,8 +38,6 @@ app.get('/health-check',async(req,res)=>{
 
 app.get("/get-new-articles",async (req,res)=>{
 
-    await initInmemoryVars();
-
     main();
 
     res.json({
@@ -48,41 +46,26 @@ app.get("/get-new-articles",async (req,res)=>{
 })
 
 app.post("/add-feed",async(req,res)=>{
+    try {
 
-     /**
-     * expected 
-     * body = {
-     *  source: string,
-     *  feedLink: string
-     * }
-     */
-     try {
-        const {source, feedLink}:{source: string, feedLink:string} = req.body;
+        const {source,feedLink} = addFeedSchema.parse(req.body);
         await addFeed(source.toLowerCase(),feedLink);
 
         res.json({
             message: "Feed added successfully"
         })
 
-     }catch(e){
-        console.log("Some problem was caused in adding the feed");
-     } 
-
-    //auth
-    // add in rssLinks -> rssMap
+    }catch(error){
+        console.log("Some problem was caused in adding the feed",error);
+    } 
 })
 
 app.post("/add-source",async(req,res)=>{
-    /**
-     * expected 
-     * body = {
-     *  source: string,
-     *  contentLocation: string
-     * }
-     */
 
     try {
-        const {source, contentLocation}:{source: string, contentLocation: string } = req.body;
+        const {source, contentLocation} = addSourceSchema.parse(req.body);
+
+        //lowercasing the source just for consistency, so we by mistake do not add the same source with different cases
         await addSource(source.toLowerCase(),contentLocation);
 
         res.json({
@@ -90,12 +73,9 @@ app.post("/add-source",async(req,res)=>{
         })
         
     } catch (error) {
-        
+        console.log("Some problem was caused in adding the source",error);
     }
 
-    
-    //auth
-    // add in sources -> sourceList
 })
 
 app.listen(PORT, ()=>{

@@ -2,12 +2,14 @@ import { getRedisPool } from "../dbClient"
 import { extractRssFeed } from "./rss"
 import { scrapeContent } from "./contentScrapper"
 import { taskHandler } from "../promptPipeline/taskQueueHandler"
-import { updateVarsPostProcess } from "../utils/initInmemoryVars"
+import { initInmemoryVars, updateVarsPostProcess } from "../utils/initInmemoryVars"
 import { sources } from "../utils/initInmemoryVars"
 import { rssLink } from "../utils/initInmemoryVars"
 
 export const main = async ()=>{
     try{
+
+        await initInmemoryVars();
 
         const n = sources.length;
 
@@ -21,7 +23,6 @@ export const main = async ()=>{
             for(let j=0;j<m;j++){
                 await extractRssFeed(linkList[j],sources[i])
             }
-            
         }
 
         await scrapeContent()

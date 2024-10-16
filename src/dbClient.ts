@@ -20,7 +20,7 @@ export const getRedisPool = (): Pool<RedisClientType> => {
             create: async () => createRedisClient(),
             destroy: async (client) => client.quit(),
         }, {
-            max: 10, // maximum size of the pool
+            max: 5, // maximum size of the pool
             min: 2,  // minimum size of the pool
         });
     }

@@ -5,6 +5,7 @@ export const addFeed = async (source: string, rssLink: string) => {
     try {
 
         const parser = new Parser();
+        //throw error if the link is not a valid rss feed
         const feed = await parser.parseURL(rssLink);
         
         const existingFeed = await prisma.rssLinks.findFirst({
