@@ -1,11 +1,10 @@
 import Parser from 'rss-parser';
-import { getRedisPool } from '../dbClient';
-import { latestTimeMap } from '../utils/initInmemoryVars';
+import { feedQueue, latestTimeMap } from '../utils/initInmemoryVars';
 
 export interface itemType {
     source: string;
     title: string;
-    pubDate: number;
+    pubDate: bigint;
     link: string;
 }
 
@@ -13,15 +12,12 @@ export interface itemType {
 export const extractRssFeed = async (feedLink: string, source: string) => {
     const parser = new Parser();
     const feed = await parser.parseURL(feedLink);
-    const pool = getRedisPool();
-    const client = await pool.acquire();
 
     try {
-        
-        const latestTime = latestTimeMap.get(feedLink) || -1;
+        const latestTime = BigInt(latestTimeMap.get(feedLink)|| -1);
 
         feed.items.forEach(async (item) => {
-            const date = Date.parse(item.pubDate || "");
+            const date = BigInt(Date.parse(item.pubDate || ""));
             if (date <= latestTime) {
                 return;
             }
@@ -32,12 +28,13 @@ export const extractRssFeed = async (feedLink: string, source: string) => {
                 pubDate: date,
                 link: item.link || ''
             };
-            //console.log("pushed into the task queue: " + entity.title );
-            await client.lPush("feedQueue", JSON.stringify(entity));
+            console.log("pushed into the feed queue: " + entity.title );
+            feedQueue.push(entity);
         });
 
         const latestItemPubDate = feed.items[0].pubDate;
-        const newLatestTime = Date.parse(latestItemPubDate || "");
+        const newLatestTime = BigInt(Date.parse(latestItemPubDate || ""));
+        console.log("new latest time: ", newLatestTime);
         latestTimeMap.set(feedLink, newLatestTime);
         
     }
@@ -45,6 +42,5 @@ export const extractRssFeed = async (feedLink: string, source: string) => {
         console.log("Error in extractRssFeed function caused an error", e);
     }
     finally {
-        pool.release(client);
     }
 };

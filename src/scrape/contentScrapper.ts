@@ -1,40 +1,32 @@
-import { RedisClientType } from "redis";
-import { getRedisPool } from "../dbClient"
 import { itemType } from "./rss";
 import puppeteer from "puppeteer";
-import { contentLocationMap } from "../utils/initInmemoryVars";
+import { contentLocationMap, feedQueue, taskQueue } from "../utils/initInmemoryVars";
+
+export type tasktype = itemType & {content: string};
 
 
 export const scrapeContent = async () => {
-    const pool = getRedisPool();
-    const client = await pool.acquire();
 
     try {
-        const numberOfItems = await client.LLEN("feedQueue");
-
-        for (let i = 0; i < numberOfItems; i++) {
-            const value = await client.rPop("feedQueue");
-            const item: itemType = JSON.parse(value || "");
-            //puppeteer code
-            const articleContent = await getPageContents(item.link, item.source);
-
-            await client.lPush("taskQueue", JSON.stringify({
-                ...item,
-                content: articleContent
-            }));
+        console.log("Scraping content");
+        
+        const n = feedQueue.length;
+        //console.log("Feed queue length: ", n);
+        for(let i=0;i<n;i++){
+            const item = feedQueue[i];
+            //const articleContent = await getPageContents(item.link, item.source);
+            console.log("pushed into the task queue: ", item.title);
+            // taskQueue.push({
+            //     ...item,
+            //     content: articleContent || ""
+            // })
         }
-    } finally {
-        pool.release(client);
+        
+    } catch (e) {
+        console.error(e);
     }
 };
 
-/*
-const contentlocation = {
-    contentElement: Map<string,string> 
-}
-    map eg -> "cnbc" : "class"
-    this can go in add feed end point
- */
 
 const getPageContents = async (url: string, source: string) => {
 

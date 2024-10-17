@@ -1,6 +1,9 @@
 
 # This is the Scrapper for FinBrief
 
+~~- no need for redis queues, can use in memory arrays~~
+- add retry functionality to the puppeteer client and handle the time out errors
+
 ## Run Locally(Always Follow)
 
 Clone the project
@@ -21,11 +24,6 @@ To get Started locally (docker desktop must be running(for deamon to be active))
   npm run build
 ```
 
-To start a redis container
-
-```bash
-  npm run cache
-```
   
 Start the server
 
@@ -33,6 +31,18 @@ Start the server
   npm run start
 ```
 
+## In-Memory Variables
+```bash
+  // In-memory queues instead of redis
+  export const feedQueue : Array<itemType> = [];
+  export const taskQueue : Array<tasktype> = [];
+
+  // In-memory variables for sources, rssLinks, contentLocationMap and latestTimeMap
+  export const sources : Array<string> = [];
+  export const rssLink : Map<string,Array<string>> = new Map<string,Array<string>>();
+  export const contentLocationMap : Map<string,string> = new Map<string,string>(); 
+  export const latestTimeMap : Map<string,bigint> = new Map<string,bigint>();
+```
 
 ## schema
 ![alt text](public/image.png)
@@ -44,24 +54,4 @@ Start the server
 
 -> Brain Storming ideas and Features on - [doc](https://docs.google.com/document/d/1qqUtHU3fa_lNoeGDPQ69PCJvUnsbVg9sLhgE8C07Dek/edit?usp=sharing)
 
-
-## what all exists in the Redis DB:
-```bash
-
-1 -> feedQueue 
-  -> element = {
-        source: string;
-        title: string;
-        pubDate: number;
-        link: string;
-    }
-
-
-2 -> taskQueue
-  -> element = {
-        ...item,
-        content: Element | null
-    }
-
-```
 

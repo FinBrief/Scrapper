@@ -1,25 +1,18 @@
-import { getRedisPool } from '../dbClient';
 import { summarize } from './summarizer';
 import { prismaClient as prisma } from '..';
+import { taskQueue } from '../utils/initInmemoryVars';
+import { tasktype } from '../scrape/contentScrapper';
 
-export interface TaskType {
-    source: string;
-    title: string;
-    pubDate: number;
-    link: string;
-    content: Element;
-}
+
 
 export const taskHandler = async () => {
-    const pool = getRedisPool();
-    const client = await pool.acquire();
 
     try {
-        const numberOfTasks = await client.LLEN("taskQueue");
+        const numberOfTasks = taskQueue.length;
 
         for (let i = 0; i < numberOfTasks; i++) {
-            const stringifiedTask = await client.rPop("taskQueue");
-            const task: TaskType = JSON.parse(stringifiedTask || '');
+            
+            const task: tasktype = taskQueue[i];
 
             const summary = await summarize(task);
 
@@ -31,13 +24,14 @@ export const taskHandler = async () => {
                             name: task.source
                         }
                     },
-                    pubDate: new Date(task.pubDate),
+                    // make sure here over flow is not possible
+                    //??????????? very important
+                    pubDate: new Date(Number(task.pubDate)),
                     link: task.link,
                     summary: summary.content|| "",
                 }
             })
         }
     } finally {
-        pool.release(client);
     }
 }; 

@@ -1,6 +1,5 @@
 import express from 'express';
 import {config } from 'dotenv';
-import { getRedisPool } from './dbClient';
 import { main } from './scrape/main';
 import { addFeed } from './utils/addFeed';
 import { addSource } from './utils/addSource';
@@ -13,8 +12,6 @@ config();
 export const prismaClient = new PrismaClient();
 
 const app = express();
-
-const pool = getRedisPool();
 
 app.use(express.json());
 const PORT = parseInt(process.env.PORT|| '');
