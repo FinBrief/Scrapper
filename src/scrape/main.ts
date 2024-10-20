@@ -23,12 +23,14 @@ export const main = async ()=>{
                 await extractRssFeed(linkList[j],sources[i])
             }
         }
+        // updating latestTimeMap so that if the process is restarted, it doesn't fetch the same content again
+        await updateVarsPostProcess()
+
 
         await scrapeContent()
 
-        //await taskHandler()
+        await taskHandler()
 
-        await updateVarsPostProcess()
        
     }catch(e){
         console.log(e)

@@ -3,8 +3,6 @@
 
 ## chore
 - added content to the task and item type as a fallback to summary.
-- add retry functionality to the puppeteer client and handle the time out errors
-- complete the prompt pipeline.
 - start standardising the responses, and check process vulnerablity to errors(server is heavily stateful, try to protect it)
 
 ## Run Locally(Always Follow)
@@ -21,7 +19,14 @@ Go to the project directory
   cd scrapper
 ```
 
-To get Started locally (docker desktop must be running(for deamon to be active))
+Fill the .env file(very important):
+
+```bash
+  Refer to .env.example 
+```
+
+
+To get Started locally first:
 
 ```bash
   npm run build

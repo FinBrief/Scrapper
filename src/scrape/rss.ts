@@ -22,7 +22,7 @@ export const extractRssFeed = async (feedLink: string, source: string) => {
                 title: item.title || '',
                 pubDate: date,
                 link: item.link || '',
-                content: item.content
+                content: item.content || '',
             };
             // console.log("description: ", item.description);
             // console.log("summary: ", item.summary);

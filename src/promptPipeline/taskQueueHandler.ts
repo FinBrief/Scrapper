@@ -17,24 +17,23 @@ export const taskHandler = async () => {
 
             console.log("Processing task: ", task.title);
 
-            // const summary = await summarize(task);
+            const summary = await summarize(task);
 
-            // await prisma.post.create({
-            //     data: {
-            //         title: task.title,
-            //         source: {
-            //             connect:{
-            //                 name: task.source
-            //             }
-            //         },
-            //         // make sure here over flow is not possible
-            //         //??????????? very important
-            //         pubDate: new Date(Number(task.pubDate)),
-            //         link: task.link,
-            //         summary: summary.content|| "",
-            //     }
-            // })
+            await prisma.post.create({
+                data: {
+                    title: task.title,
+                    source: {
+                        connect:{
+                            name: task.source
+                        }
+                    },
+                    pubDate: new Date(Number(task.pubDate)),
+                    link: task.link,
+                    summary: summary|| "",
+                }
+            })
         }
-    } finally {
+    } catch (e) {
+        console.error("Error in taskHandler function caused an error", e);
     }
 }; 

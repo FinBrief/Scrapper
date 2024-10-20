@@ -12,12 +12,11 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@crawlee/core": "^3.11.5",
-    "@crawlee/playwright": "^3.11.5",
     "@prisma/client": "^5.20.0",
     "@redis/graph": "^1.1.1",
     "@types/express": "^5.0.0",
     "@types/puppeteer": "^5.4.7",
+    "crawlee": "^3.11.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
     "generic-pool": "^3.9.0",

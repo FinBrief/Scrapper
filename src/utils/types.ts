@@ -17,7 +17,7 @@ export interface itemType {
     title: string;
     pubDate: bigint;
     link: string;
-    content?: string;
+    content: string;
     
 }
 

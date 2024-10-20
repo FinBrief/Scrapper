@@ -23,7 +23,7 @@ export const scrapeContent = async () => {
             console.log("pushed into the task queue: ", item.title);
             taskQueue.push({
                 ...item,
-                summary: articleContent
+                content: articleContent
             })
         }
         
@@ -49,13 +49,13 @@ const getPageContents = async (url:string, source:string) => {
         for (let i = 0; i < retries; i++) {
             try {
                 //console.log(`Attempt ${i+1} for URL: ${url}`);
-                await page.goto(url, { waitUntil: 'networkidle2', timeout: 10000 });
-                await page.waitForSelector(location, { timeout: 5000 });
+                await page.goto(url, { waitUntil: 'networkidle2', timeout: 7000 });
+                await page.waitForSelector(location, { timeout: 3000 });
                 
                 content = await page.evaluate((location) => {
                     try {
                         const contentElement = document.querySelector(location);
-                        return contentElement ? contentElement.innerHTML : null;
+                        return contentElement ? contentElement.textContent : null;
                     } catch (e) {
                         return null;
                     }
