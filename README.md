@@ -1,8 +1,11 @@
 
 # This is the Scrapper for FinBrief
 
-~~- no need for redis queues, can use in memory arrays~~
+## chore
+- added content to the task and item type as a fallback to summary.
 - add retry functionality to the puppeteer client and handle the time out errors
+- complete the prompt pipeline.
+- start standardising the responses, and check process vulnerablity to errors(server is heavily stateful, try to protect it)
 
 ## Run Locally(Always Follow)
 

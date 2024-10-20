@@ -1,12 +1,7 @@
 import Parser from 'rss-parser';
 import { feedQueue, latestTimeMap } from '../utils/initInmemoryVars';
+import { itemType } from '../utils/types';
 
-export interface itemType {
-    source: string;
-    title: string;
-    pubDate: bigint;
-    link: string;
-}
 
 
 export const extractRssFeed = async (feedLink: string, source: string) => {
@@ -26,8 +21,15 @@ export const extractRssFeed = async (feedLink: string, source: string) => {
                 source,
                 title: item.title || '',
                 pubDate: date,
-                link: item.link || ''
+                link: item.link || '',
+                content: item.content
             };
+            // console.log("description: ", item.description);
+            // console.log("summary: ", item.summary);
+            // console.log("date",item.isoDate);
+            // console.log("content: ", item.content);
+            // console.log("categories: ", item.categories );
+
             console.log("pushed into the feed queue: " + entity.title );
             feedQueue.push(entity);
         });

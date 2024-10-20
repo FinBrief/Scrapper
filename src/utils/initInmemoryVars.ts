@@ -1,10 +1,10 @@
 import { prismaClient as prisma } from "..";
-import { tasktype } from "../scrape/contentScrapper";
-import { itemType } from "../scrape/rss";
+import { itemType, taskType } from "./types";
+
 
 // In-memory queues instead of redis
 export const feedQueue : Array<itemType> = [];
-export const taskQueue : Array<tasktype> = [];
+export const taskQueue : Array<taskType> = [];
 
 // In-memory variables for sources, rssLinks, contentLocationMap and latestTimeMap
 export const sources : Array<string> = [];

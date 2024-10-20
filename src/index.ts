@@ -4,7 +4,7 @@ import { main } from './scrape/main';
 import { addFeed } from './utils/addFeed';
 import { addSource } from './utils/addSource';
 import { PrismaClient } from '@prisma/client';
-import { addFeedSchema, addSourceSchema } from './utils/requestTypes';
+import { addFeedSchema, addSourceSchema } from './utils/types';
 
 
 config();

@@ -1,8 +1,9 @@
-import { itemType } from "./rss";
-import puppeteer from "puppeteer";
-import { contentLocationMap, feedQueue, taskQueue } from "../utils/initInmemoryVars";
 
-export type tasktype = itemType & {content: string};
+import puppeteer from "puppeteer-extra";
+import { contentLocationMap, feedQueue, taskQueue } from "../utils/initInmemoryVars";
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+
+puppeteer.use(StealthPlugin());
 
 
 export const scrapeContent = async () => {
@@ -14,12 +15,16 @@ export const scrapeContent = async () => {
         //console.log("Feed queue length: ", n);
         for(let i=0;i<n;i++){
             const item = feedQueue[i];
-            //const articleContent = await getPageContents(item.link, item.source);
+            const articleContent = await getPageContents(item.link, item.source);
+            if(!articleContent){
+                console.error("Failed to fetch content for: ", item.title);
+                continue;
+            }
             console.log("pushed into the task queue: ", item.title);
-            // taskQueue.push({
-            //     ...item,
-            //     content: articleContent || ""
-            // })
+            taskQueue.push({
+                ...item,
+                summary: articleContent
+            })
         }
         
     } catch (e) {
@@ -28,32 +33,45 @@ export const scrapeContent = async () => {
 };
 
 
-const getPageContents = async (url: string, source: string) => {
 
+const getPageContents = async (url:string, source:string) => {
     try {
-        
         const location = contentLocationMap.get(source);
-
-        if(!location){
+        if (!location) {
             throw new Error("Location not found");
         }
 
         const browser = await puppeteer.launch({ headless: true });
         const page = await browser.newPage();
+        const retries = 7;
+        let content;
 
-        await page.goto(url, { waitUntil: 'networkidle2' });
-        // Use a dot to target class selector
-        await page.waitForSelector(location); 
-
-        const content = await page.evaluate((location) => {
-            const contentElement = document.querySelector(location); // Use the parameter properly
-            return contentElement ? contentElement.innerHTML : null; // Extract the innerHTML
-        }, location);
+        for (let i = 0; i < retries; i++) {
+            try {
+                //console.log(`Attempt ${i+1} for URL: ${url}`);
+                await page.goto(url, { waitUntil: 'networkidle2', timeout: 10000 });
+                await page.waitForSelector(location, { timeout: 5000 });
+                
+                content = await page.evaluate((location) => {
+                    try {
+                        const contentElement = document.querySelector(location);
+                        return contentElement ? contentElement.innerHTML : null;
+                    } catch (e) {
+                        return null;
+                    }
+                }, location);
+                console.log('scrapping successfull: ',url);
+                if (content) break; // Exit loop if content is successfully fetched
+            } catch (e) {
+                //console.error(`Retry ${i+1} failed for URL: ${url}`, e);
+            }
+        }
 
         await browser.close();
         return content;
-    }catch(e){
+    } catch (e) {
         console.error(e);
     }
 };
+
 

@@ -12,6 +12,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@crawlee/core": "^3.11.5",
+    "@crawlee/playwright": "^3.11.5",
     "@prisma/client": "^5.20.0",
     "@redis/graph": "^1.1.1",
     "@types/express": "^5.0.0",
@@ -20,7 +22,10 @@
     "express": "^4.21.0",
     "generic-pool": "^3.9.0",
     "openai": "^4.67.1",
+    "playwright": "^1.48.1",
     "puppeteer": "^23.5.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
     "rss-parser": "^3.13.0",
     "zod": "^3.23.8"
   }

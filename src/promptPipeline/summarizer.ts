@@ -1,14 +1,14 @@
 
 import OpenAI from "openai";
-import { TaskType } from "./taskQueueHandler";
 import { prompt } from "../utils/getPrompt";
+import { taskType } from "../utils/types";
 
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export const summarize = async (task: TaskType)=>{
+export const summarize = async (task: taskType)=>{
     const response = await openai.chat.completions.create({
         model: "gpt-4o",
         messages: [
