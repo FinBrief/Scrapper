@@ -28,6 +28,7 @@ export const addFeed = async (source: string, rssLink: string) => {
             data:{
                 name: feed.title || "",
                 link: rssLink,
+                latestPostTime: BigInt(Date.now()),
                 source: {
                     connect:{
                         name: source

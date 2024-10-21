@@ -31,7 +31,7 @@ export const main = async ()=>{
 
         await taskHandler()
 
-       
+       console.log("Process completed successfully");
     }catch(e){
         console.log(e)
     }

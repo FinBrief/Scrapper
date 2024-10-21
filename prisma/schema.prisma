@@ -49,5 +49,5 @@ model rssLinks{
   link              String      @unique
   source            sources     @relation(fields: [sourceId], references: [id])
   sourceId          String
-  latestPostTime    BigInt         @default(-1)
+  latestPostTime    BigInt       
 }
