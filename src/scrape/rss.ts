@@ -35,7 +35,8 @@ export const extractRssFeed = async (feedLink: string, source: string) => {
         });
 
         const latestItemPubDate = feed.items[0].pubDate;
-        const newLatestTime = BigInt(Date.parse(latestItemPubDate || ""));
+        // just added 10 seconds extra for safety 
+        const newLatestTime = BigInt(Date.parse(latestItemPubDate || "")+10000);
         console.log("new latest time: ", newLatestTime);
         latestTimeMap.set(feedLink, newLatestTime);
         
