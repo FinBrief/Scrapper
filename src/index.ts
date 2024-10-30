@@ -5,20 +5,19 @@ import { addFeed } from './utils/addFeed';
 import { addSource } from './utils/addSource';
 import { PrismaClient } from '@prisma/client';
 import { addFeedSchema, addSourceSchema } from './utils/types';
+import { scrapePulse } from './scrape/pulse';
 
 
 config();
 
-export const prismaClient = new PrismaClient();
-
 const app = express();
-
-app.use(express.json());
 const PORT = parseInt(process.env.PORT|| '');
 
+app.use(express.json());
 
-app.get('/health-check',async(req,res)=>{
+export const prismaClient = new PrismaClient();
 
+app.get('/health-check', async(req,res) => {
     try {
         await prismaClient.$connect();
         res.json({
@@ -31,9 +30,7 @@ app.get('/health-check',async(req,res)=>{
     }
 })
 
-
-
-app.get("/get-new-articles",async (req,res)=>{
+app.get("/get-new-articles", async(req,res) => {
 
     main();
 
@@ -42,7 +39,20 @@ app.get("/get-new-articles",async (req,res)=>{
     })
 })
 
-app.post("/add-feed",async(req,res)=>{
+
+//Different route for now, add to main
+app.get("/scrape-pulse", async(req,res) => {
+    try {
+        res.json({
+            message: "Started the process"
+        })
+        await scrapePulse();
+    } catch (error) {
+        console.log("Some problem was caused in scraping pulse", error);
+    }
+})
+
+app.post("/add-feed", async(req,res) => {
     try {
 
         const {source,feedLink} = addFeedSchema.parse(req.body);
@@ -57,8 +67,7 @@ app.post("/add-feed",async(req,res)=>{
     } 
 })
 
-app.post("/add-source",async(req,res)=>{
-
+app.post("/add-source", async(req,res) => {
     try {
         const {source, contentLocation} = addSourceSchema.parse(req.body);
 
@@ -72,7 +81,6 @@ app.post("/add-source",async(req,res)=>{
     } catch (error) {
         console.log("Some problem was caused in adding the source",error);
     }
-
 })
 
 app.listen(PORT, ()=>{
