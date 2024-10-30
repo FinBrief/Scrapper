@@ -48,7 +48,6 @@ const getPageContents = async (url:string, source:string) => {
 
         for (let i = 0; i < retries; i++) {
             try {
-                //console.log(`Attempt ${i+1} for URL: ${url}`);
                 await page.goto(url, { waitUntil: 'networkidle2', timeout: 7000 });
                 await page.waitForSelector(location, { timeout: 3000 });
                 
@@ -61,9 +60,8 @@ const getPageContents = async (url:string, source:string) => {
                     }
                 }, location);
                 console.log('scrapping successfull: ',url);
-                if (content) break; // Exit loop if content is successfully fetched
+                if (content) break; 
             } catch (e) {
-                //console.error(`Retry ${i+1} failed for URL: ${url}`, e);
             }
         }
 

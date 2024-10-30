@@ -1,5 +1,4 @@
 import puppeteer from "puppeteer-extra";
-import { taskQueue } from "../utils/initInmemoryVars";
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import { itemType } from "../utils/types";
 
