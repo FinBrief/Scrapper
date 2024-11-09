@@ -12,7 +12,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@prisma/client": "^5.21.1",
+    "@prisma/client": "^5.22.0",
     "@types/express": "^5.0.0",
     "@types/puppeteer": "^5.4.7",
     "dotenv": "^16.4.5",
@@ -27,3 +27,4 @@
     "zod": "^3.23.8"
   }
 }
+

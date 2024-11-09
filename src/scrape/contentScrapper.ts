@@ -46,10 +46,7 @@ const getPageContents = async (url:string, source:string) => {
             args: [
                 '--no-sandbox',
                 '--disable-setuid-sandbox',
-                '--disable-dev-shm-usage',
-                '--disable-gpu',
-                '--no-zygote',
-                '--single-process'
+                '--disable-dev-shm-usage'
             ]
          });
         const page = await browser.newPage();

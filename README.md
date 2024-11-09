@@ -2,8 +2,7 @@
 # This is the Scrapper for FinBrief
 
 ## chore
-- added content to the task and item type as a fallback to summary.
-- start standardising the responses, and check process vulnerablity to errors(server is heavily stateful, try to protect it)
+- Add deployment instructions
 
 ## Run Locally(Always Follow)
 
@@ -56,10 +55,3 @@ Start the server
 ![alt text](public/image.png)
 
  
-## current stuck ups 
- - streamlining the propmpt pipeline
-
-
--> Brain Storming ideas and Features on - [doc](https://docs.google.com/document/d/1qqUtHU3fa_lNoeGDPQ69PCJvUnsbVg9sLhgE8C07Dek/edit?usp=sharing)
-
-
