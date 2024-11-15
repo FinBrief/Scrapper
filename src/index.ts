@@ -7,17 +7,32 @@ import { PrismaClient } from '@prisma/client';
 import { addFeedSchema, addSourceSchema } from './utils/types';
 import { scrapePulse } from './scrape/pulse';
 
-
 config();
 
 const app = express();
-const PORT = parseInt(process.env.PORT|| '');
+const PORT = parseInt(process.env.PORT || '');
 
 app.use(express.json());
 
 export const prismaClient = new PrismaClient();
 
-app.get('/health-check', async(req,res) => {
+const authenticate = (
+    req: express.Request, 
+    res: express.Response, 
+    next: express.NextFunction
+) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token || token !== process.env.SCRAPER_TOKEN) {
+        res.status(401).json({ message: "Unauthorized: Invalid or missing token" });
+        return;
+    }
+
+    next();
+};
+
+app.get('/health-check', async (req, res) => {
     try {
         await prismaClient.$connect();
         res.json({
@@ -30,18 +45,18 @@ app.get('/health-check', async(req,res) => {
     }
 })
 
-app.get("/get-new-articles", async(req,res) => {
+app.get("/get-new-articles", authenticate, async (req, res) => {
 
     main();
 
-    res.json({
+    res.status(200).json({
         message: "Started the process"
     })
 })
 
 
 //Different route for now, add to main
-app.get("/scrape-pulse", async(req,res) => {
+app.get("/scrape-pulse", authenticate, async (req, res) => {
     try {
         res.json({
             message: "Started the process"
@@ -52,7 +67,7 @@ app.get("/scrape-pulse", async(req,res) => {
     }
 })
 
-app.post("/add-feed", async(req,res) => {
+app.post("/add-feed", authenticate, async (req, res) => {
     try {
 
         const {source,feedLink} = addFeedSchema.parse(req.body);
@@ -67,7 +82,7 @@ app.post("/add-feed", async(req,res) => {
     } 
 })
 
-app.post("/add-source", async(req,res) => {
+app.post("/add-source", authenticate, async (req, res) => {
     try {
         const {source, contentLocation} = addSourceSchema.parse(req.body);
 
@@ -84,5 +99,5 @@ app.post("/add-source", async(req,res) => {
 })
 
 app.listen(PORT, ()=>{
-    console.log("Scrapper running on port 3000");
+    console.log(`Scrapper running on port ${PORT}`);
 })
